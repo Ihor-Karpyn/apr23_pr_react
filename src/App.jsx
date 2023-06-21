@@ -74,7 +74,7 @@ export const App = () => {
     setSelectedUserId(userId);
   };
 
-  const handleAddCategory = (categoryId) => {
+  const handleToggleCategory = (categoryId) => {
     if (selectedCategoriesId.includes(categoryId)) {
       setSelectedCategoriesId(
         selectedCategoriesId.filter(id => categoryId !== id),
@@ -198,7 +198,7 @@ export const App = () => {
                   })}
                   href="#/"
                   key={category.id}
-                  onClick={() => handleAddCategory(category.id)}
+                  onClick={() => handleToggleCategory(category.id)}
                 >
                   {category.title}
                 </a>
