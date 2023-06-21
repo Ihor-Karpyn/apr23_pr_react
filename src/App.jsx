@@ -32,8 +32,25 @@ function getProductsByUser(productsList, user) {
   return visibleProducts;
 }
 
+function getFilteredProducts(productsList, query) {
+  if (query.trim() === '') {
+    return productsList;
+  }
+
+  const loweredQuery = query.toLowerCase().trim();
+
+  const filteredProducts = productsList.filter((product) => {
+    const productName = product.name.toLowerCase();
+
+    return productName.includes(loweredQuery);
+  });
+
+  return filteredProducts;
+}
+
 export const App = () => {
   const [selectedUser, setSelectedUser] = useState(null);
+  const [input, setInput] = useState('');
 
   const selectUser = (user) => {
     if (selectedUser !== user) {
@@ -41,7 +58,16 @@ export const App = () => {
     }
   };
 
+  const handleInputChange = (event) => {
+    setInput(event.target.value);
+  };
+
+  const handleClearInput = () => {
+    setInput('');
+  };
+
   const preparedProducts = getProductsByUser(products, selectedUser);
+  const filteredProducts = getFilteredProducts(preparedProducts, input);
 
   return (
     <div className="section">
@@ -81,21 +107,25 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={input}
+                  onChange={handleInputChange}
                 />
 
                 <span className="icon is-left">
                   <i className="fas fa-search" aria-hidden="true" />
                 </span>
-
-                <span className="icon is-right">
-                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                  <button
-                    data-cy="ClearButton"
-                    type="button"
-                    className="delete"
-                  />
-                </span>
+                {input && (
+                  <span className="icon is-right">
+                    {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                    <button
+                      data-cy="ClearButton"
+                      type="button"
+                      className="delete"
+                      onClick={handleClearInput}
+                    />
+                  </span>
+                )
+              }
               </p>
             </div>
 
@@ -214,7 +244,7 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {preparedProducts.map(product => (
+              {filteredProducts.map(product => (
                 <tr key={product.id} data-cy="Product">
                   <td className="has-text-weight-bold" data-cy="ProductId">
                     {product.id}
