@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import cn from 'classnames';
 import './App.scss';
+import { getProductsByUser, getFilteredProducts } from './heplers';
+import { User } from './components/User/User';
 
 import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
@@ -21,32 +23,32 @@ const products = productsFromServer.map((product) => {
   };
 });
 
-function getProductsByUser(productsList, user) {
-  if (user === null) {
-    return productsList;
-  }
+// function getProductsByUser(productsList, user) {
+//   if (user === null) {
+//     return productsList;
+//   }
 
-  const visibleProducts = productsList.filter(product => (
-    product.user.id === user.id));
+//   const visibleProducts = productsList.filter(product => (
+//     product.user.id === user.id));
 
-  return visibleProducts;
-}
+//   return visibleProducts;
+// }
 
-function getFilteredProducts(productsList, query) {
-  if (query.trim() === '') {
-    return productsList;
-  }
+// function getFilteredProducts(productsList, query) {
+//   if (query.trim() === '') {
+//     return productsList;
+//   }
 
-  const loweredQuery = query.toLowerCase().trim();
+//   const loweredQuery = query.toLowerCase().trim();
 
-  const filteredProducts = productsList.filter((product) => {
-    const productName = product.name.toLowerCase();
+//   const filteredProducts = productsList.filter((product) => {
+//     const productName = product.name.toLowerCase();
 
-    return productName.includes(loweredQuery);
-  });
+//     return productName.includes(loweredQuery);
+//   });
 
-  return filteredProducts;
-}
+//   return filteredProducts;
+// }
 
 export const App = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -88,15 +90,11 @@ export const App = () => {
                 All
               </a>
               {usersFromServer.map(user => (
-                <a
-                  data-cy="FilterUser"
-                  href="#/"
-                  key={user.id}
-                  className={cn({ 'is-active': selectedUser === user })}
-                  onClick={() => selectUser(user)}
-                >
-                  {user.name}
-                </a>
+                <User
+                  user={user}
+                  selectedUser={selectedUser}
+                  selectUser={selectUser}
+                />
               ))}
             </p>
 
