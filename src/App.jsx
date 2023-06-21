@@ -47,7 +47,9 @@ export const App = () => {
         .includes(productItem.categoryId);
     }
 
-    return matchUserName && matchSearchQuerry && matchSelectedCategories;
+    return matchUserName
+      && matchSearchQuerry
+      && matchSelectedCategories;
   });
 
   const isNoMatchingProducts = preparedProducts.length === 0;
