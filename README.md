@@ -33,7 +33,7 @@ Implement as much options below as you can:
 ## Instructions
 - Fork, clone and run `npm i`
 - fix the DEMO LINK below (use your github username and the repo name)
-  - [DEMO LINK](https://<your-account>.github.io/<your-repo-name>)
+  - [DEMO LINK](https://vchervinko.github.io/<your-repo-name>)
 - implement tasks one by one (You can do it in the `App.jsx`)
 - `commit`, `push` and `deploy` after each task
 - Stop when the time is over (typically 2.5 hours from start)
