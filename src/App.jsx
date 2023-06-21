@@ -24,18 +24,35 @@ const products = productsFromServer.map((product) => {
 
 export const App = () => {
   const [selectedUserId, setSelectedUserId] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const preparedProducts = products.filter((productItem) => {
-    let result = true;
+    let matchUserName = true;
+    let matchSearchQuerry = true;
 
     if (selectedUserId) {
-      result = selectedUserId === productItem.user.id;
+      matchUserName = selectedUserId === productItem.user.id;
     }
 
-    return result;
+    if (searchQuery) {
+      const regex = new RegExp(searchQuery, 'gi');
+
+      matchSearchQuerry = regex.test(productItem.name);
+    }
+
+    return matchUserName && matchSearchQuerry;
   });
 
   const isNoMatchingProducts = preparedProducts.length === 0;
+  const isSearchQueryNotEmpty = searchQuery;
+
+  const onSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleResetInput = () => {
+    setSearchQuery('');
+  };
 
   return (
     <div className="section">
@@ -83,21 +100,26 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={searchQuery}
+                  onChange={onSearchChange}
                 />
 
                 <span className="icon is-left">
                   <i className="fas fa-search" aria-hidden="true" />
                 </span>
 
+                {isSearchQueryNotEmpty
+                && (
                 <span className="icon is-right">
                   {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
                   <button
                     data-cy="ClearButton"
                     type="button"
                     className="delete"
+                    onClick={handleResetInput}
                   />
                 </span>
+                )}
               </p>
             </div>
 
