@@ -23,7 +23,19 @@ const products = productsFromServer.map((product) => {
 });
 
 export const App = () => {
-  const [selectedUser, setSelectedUser] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState(0);
+
+  const preparedProducts = products.filter((productItem) => {
+    let result = true;
+
+    if (selectedUserId) {
+      result = selectedUserId === productItem.user.id;
+    }
+
+    return result;
+  });
+
+  const isNoMatchingProducts = preparedProducts.length === 0;
 
   return (
     <div className="section">
@@ -38,31 +50,30 @@ export const App = () => {
               <a
                 data-cy="FilterAllUsers"
                 href="#/"
+                className={cn({
+                  'is-active': selectedUserId === 0,
+                })}
+                onClick={() => setSelectedUserId(0)}
               >
                 All
               </a>
+              {usersFromServer.map((selectedUser) => {
+                const { id, name } = selectedUser;
 
-              <a
-                data-cy="FilterUser"
-                href="#/"
-              >
-                User 1
-              </a>
-
-              <a
-                data-cy="FilterUser"
-                href="#/"
-                className="is-active"
-              >
-                User 2
-              </a>
-
-              <a
-                data-cy="FilterUser"
-                href="#/"
-              >
-                User 3
-              </a>
+                return (
+                  <a
+                    key={id}
+                    data-cy="FilterUser"
+                    href="#/"
+                    className={cn({
+                      'is-active': id === selectedUserId,
+                    })}
+                    onClick={() => setSelectedUserId(id)}
+                  >
+                    {name}
+                  </a>
+                );
+              })}
             </p>
 
             <div className="panel-block">
@@ -144,10 +155,15 @@ export const App = () => {
         </div>
 
         <div className="box table-container">
-          {/* <p data-cy="NoMatchingMessage">
+          {isNoMatchingProducts
+          && (
+          <p data-cy="NoMatchingMessage">
             No products matching selected criteria
-          </p> */}
+          </p>
+          )}
 
+          {!isNoMatchingProducts
+          && (
           <table
             data-cy="ProductTable"
             className="table is-striped is-narrow is-fullwidth"
@@ -205,7 +221,7 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {products.map((product) => {
+              {preparedProducts.map((product) => {
                 const { name, id: productId } = product;
                 const { title, icon } = product.category;
                 const { name: username, sex } = product.user;
@@ -235,6 +251,7 @@ export const App = () => {
               })}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </div>
