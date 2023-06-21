@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { ProductTableHeader } from './ProductTableHeader';
 import { ProductTableBody } from './ProductTableBody';
 import { filterProducts } from '../helpers';
@@ -40,6 +41,9 @@ export const ProductTable = () => {
             <a
               data-cy="FilterAllUsers"
               href="#/"
+              className={classNames({ 'is-active': searchQuery === '' })}
+              value={searchQuery}
+              onClick={() => setSearchQuery('')}
             >
               All
             </a>
@@ -47,23 +51,41 @@ export const ProductTable = () => {
             <a
               data-cy="FilterUser"
               href="#/"
+              className={classNames({ 'is-active': searchQuery === 'Roma' })}
+              value={searchQuery}
+              onClick={() => setSearchQuery('Roma')}
             >
-              User 1
+              Roma
             </a>
 
             <a
               data-cy="FilterUser"
               href="#/"
-              className="is-active"
+              className={classNames({ 'is-active': searchQuery === 'Anna' })}
+              value={searchQuery}
+              onClick={() => setSearchQuery('Anna')}
             >
-              User 2
+              Anna
             </a>
 
             <a
               data-cy="FilterUser"
               href="#/"
+              className={classNames({ 'is-active': searchQuery === 'Max' })}
+              value={searchQuery}
+              onClick={() => setSearchQuery('Max')}
             >
-              User 3
+              Max
+            </a>
+
+            <a
+              data-cy="FilterUser"
+              href="#/"
+              className={classNames({ 'is-active': searchQuery === 'John' })}
+              value={searchQuery}
+              onClick={() => setSearchQuery('John')}
+            >
+              John
             </a>
           </p>
 
