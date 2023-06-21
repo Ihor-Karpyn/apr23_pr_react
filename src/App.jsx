@@ -21,8 +21,27 @@ const products = productsFromServer.map((product) => {
   };
 });
 
+function getProductsByUser(productsList, user) {
+  if (user === null) {
+    return productsList;
+  }
+
+  const visibleProducts = productsList.filter(product => (
+    product.user.id === user.id));
+
+  return visibleProducts;
+}
+
 export const App = () => {
-  const [selectedUser, setSelectedUser] = useState();
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const selectUser = (user) => {
+    if (selectedUser !== user) {
+      setSelectedUser(user);
+    }
+  };
+
+  const preparedProducts = getProductsByUser(products, selectedUser);
 
   return (
     <div className="section">
@@ -37,31 +56,22 @@ export const App = () => {
               <a
                 data-cy="FilterAllUsers"
                 href="#/"
+                className={cn({ 'is-active': selectedUser === null })}
+                onClick={() => selectUser(null)}
               >
                 All
               </a>
-
-              <a
-                data-cy="FilterUser"
-                href="#/"
-              >
-                User 1
-              </a>
-
-              <a
-                data-cy="FilterUser"
-                href="#/"
-                className="is-active"
-              >
-                User 2
-              </a>
-
-              <a
-                data-cy="FilterUser"
-                href="#/"
-              >
-                User 3
-              </a>
+              {usersFromServer.map(user => (
+                <a
+                  data-cy="FilterUser"
+                  href="#/"
+                  key={user.id}
+                  className={cn({ 'is-active': selectedUser === user })}
+                  onClick={() => selectUser(user)}
+                >
+                  {user.name}
+                </a>
+              ))}
             </p>
 
             <div className="panel-block">
@@ -204,8 +214,8 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {products.map(product => (
-                <tr data-cy="Product">
+              {preparedProducts.map(product => (
+                <tr key={product.id} data-cy="Product">
                   <td className="has-text-weight-bold" data-cy="ProductId">
                     {product.id}
                   </td>
