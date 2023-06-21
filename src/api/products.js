@@ -1,4 +1,4 @@
-export default [
+const productsFromServer = [
   {
     id: 1,
     name: 'Milk',
@@ -45,3 +45,5 @@ export default [
     categoryId: 3,
   },
 ];
+
+export default productsFromServer;

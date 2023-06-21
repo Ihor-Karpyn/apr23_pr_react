@@ -1,4 +1,4 @@
-export default [
+const categoriesFromServer = [
   {
     id: 1,
     title: 'Grocery',
@@ -30,3 +30,5 @@ export default [
     ownerId: 3,
   },
 ];
+
+export default categoriesFromServer;
