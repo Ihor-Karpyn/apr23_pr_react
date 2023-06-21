@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import cn from 'classnames';
 import './App.scss';
+import { SortIcon } from './components/SortIcon';
 
 import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
+
+const categoryTypes = ['ID', 'Product', 'Category', 'User'];
 
 const preparedProducts = productsFromServer.map((product) => {
   const category = categoriesFromServer.find(c => (
@@ -28,25 +31,108 @@ export const App = () => {
   const [selectedUserId, setSelectedUserId] = useState(0);
   const [selectedCategoriesId, setSelectedCategoriesId] = useState([]);
   const [query, setQuery] = useState('');
+  const [sortType, setSortType] = useState('None');
+  const [sortClick, setSortClick] = useState(0);
+  const [isReversed, setIsReversed] = useState(false);
+
+  const handleSortClick = (type) => {
+    if (sortType !== type) {
+      setSortType(type);
+      setIsReversed(false);
+      setSortClick(1);
+    } else if (sortClick === 1) {
+      setIsReversed(true);
+      setSortClick(2);
+    } else {
+      setSortType('None');
+      setIsReversed(false);
+      setSortClick(0);
+    }
+  };
 
   useEffect(() => {
     setProducts(preparedProducts);
   }, []);
 
-  const visibleProducts = products.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     const normalizedQuery = query.replace(/\s/g, '').toLowerCase();
     const normalizedProduct = product.name.toLowerCase();
 
     const isProductMatch = normalizedProduct.includes(normalizedQuery);
 
-    const shouldShowProduct = !selectedUserId
+    const isOwnerMatch = !selectedUserId
       || product.category?.owner?.id === selectedUserId;
 
-    const isCategorySelected = !selectedCategoriesId.length
+    const isCategoryMatch = !selectedCategoriesId.length
       || selectedCategoriesId.includes(product.category?.id);
 
-    return isProductMatch && shouldShowProduct && isCategorySelected;
+    return isProductMatch && isOwnerMatch && isCategoryMatch;
   });
+
+  const getSortedProducts = () => {
+    const copyProducts = [...filteredProducts];
+
+    copyProducts.sort((productA, productB) => {
+      switch (sortType) {
+        case 'ID':
+          return productA.id - productB.id;
+
+        case 'Product':
+          return productA.name.localeCompare(productB.name);
+
+        case 'Category':
+          return productA.category?.title.localeCompare(
+            productB.category?.title,
+          );
+
+        case 'User':
+          return productA.category?.owner?.name.localeCompare(
+            productB.category?.owner?.name,
+          );
+
+        default:
+          return 0;
+      }
+    });
+
+    if (isReversed) {
+      copyProducts.reverse();
+    }
+
+    return copyProducts;
+  };
+
+  const visibleProducts = getSortedProducts();
+
+  const changeCategoryOnClick = (categoryId) => {
+    if (selectedCategoriesId.includes(categoryId)) {
+      setSelectedCategoriesId(currentCategories => (
+        currentCategories.filter(id => id !== categoryId)
+      ));
+    } else {
+      setSelectedCategoriesId(currentCategories => [
+        ...currentCategories,
+        categoryId,
+      ]);
+    }
+  };
+
+  const handleQueryOnChange = (event) => {
+    setQuery(event.target.value);
+  };
+
+  const handleResetQueryOnClick = () => setQuery('');
+
+  const handleAllCategoriesOnClick = () => setSelectedCategoriesId([]);
+
+  const handleResetAllOnClick = () => {
+    setSelectedUserId(0);
+    setSelectedCategoriesId([]);
+    setQuery('');
+    setSortType('None');
+    setSortClick(0);
+    setIsReversed(false);
+  };
 
   return (
     <div className="section">
@@ -91,9 +177,7 @@ export const App = () => {
                   className="input"
                   placeholder="Search"
                   value={query}
-                  onChange={(event) => {
-                    setQuery(event.target.value);
-                  }}
+                  onChange={handleQueryOnChange}
                 />
 
                 <span className="icon is-left">
@@ -107,7 +191,7 @@ export const App = () => {
                       data-cy="ClearButton"
                       type="button"
                       className="delete"
-                      onClick={() => setQuery('')}
+                      onClick={handleResetQueryOnClick}
                     />
                   </span>
                 )}
@@ -121,7 +205,7 @@ export const App = () => {
                 className={cn('button is-success mr-6', {
                   'is-outlined': selectedCategoriesId.length > 0,
                 })}
-                onClick={() => setSelectedCategoriesId([])}
+                onClick={handleAllCategoriesOnClick}
               >
                 All
               </a>
@@ -133,18 +217,7 @@ export const App = () => {
                     'is-info': selectedCategoriesId.includes(category.id),
                   })}
                   href="#/"
-                  onClick={() => {
-                    if (selectedCategoriesId.includes(category.id)) {
-                      setSelectedCategoriesId(currentCategories => (
-                        currentCategories.filter(id => id !== category.id)
-                      ));
-                    } else {
-                      setSelectedCategoriesId(currentCategories => [
-                        ...currentCategories,
-                        category.id,
-                      ]);
-                    }
-                  }}
+                  onClick={() => changeCategoryOnClick(category.id)}
                 >
                   {category.title}
                 </a>
@@ -156,11 +229,7 @@ export const App = () => {
                 data-cy="ResetAllButton"
                 href="#/"
                 className="button is-link is-outlined is-fullwidth"
-                onClick={() => {
-                  setSelectedUserId(0);
-                  setQuery('');
-                  setSelectedCategoriesId([]);
-                }}
+                onClick={handleResetAllOnClick}
               >
                 Reset all filters
               </a>
@@ -182,53 +251,16 @@ export const App = () => {
             >
               <thead>
                 <tr>
-                  <th>
-                    <span className="is-flex is-flex-wrap-nowrap">
-                      ID
-
-                      <a href="#/">
-                        <span className="icon">
-                          <i data-cy="SortIcon" className="fas fa-sort" />
-                        </span>
-                      </a>
-                    </span>
-                  </th>
-
-                  <th>
-                    <span className="is-flex is-flex-wrap-nowrap">
-                      Product
-
-                      <a href="#/">
-                        <span className="icon">
-                          <i data-cy="SortIcon" className="fas fa-sort-down" />
-                        </span>
-                      </a>
-                    </span>
-                  </th>
-
-                  <th>
-                    <span className="is-flex is-flex-wrap-nowrap">
-                      Category
-
-                      <a href="#/">
-                        <span className="icon">
-                          <i data-cy="SortIcon" className="fas fa-sort-up" />
-                        </span>
-                      </a>
-                    </span>
-                  </th>
-
-                  <th>
-                    <span className="is-flex is-flex-wrap-nowrap">
-                      User
-
-                      <a href="#/">
-                        <span className="icon">
-                          <i data-cy="SortIcon" className="fas fa-sort" />
-                        </span>
-                      </a>
-                    </span>
-                  </th>
+                  {categoryTypes.map(category => (
+                    <th>
+                      <SortIcon
+                        title={category}
+                        onClick={handleSortClick}
+                        sortType={sortType}
+                        sortClick={sortClick}
+                      />
+                    </th>
+                  ))}
                 </tr>
               </thead>
 
