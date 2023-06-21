@@ -239,7 +239,10 @@ export const App = () => {
 
                         <a href="#/">
                           <span className="icon">
-                            <i data-cy="SortIcon" className="fas fa-sort" />
+                            <i
+                              data-cy="SortIcon"
+                              className="fas fa-sort"
+                            />
                           </span>
                         </a>
                       </span>
