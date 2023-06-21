@@ -22,6 +22,11 @@ const products = productsFromServer.map((product) => {
 export const App = () => {
   const [chosenOwner, setChosenOwner] = useState('All');
   const [query, setQuery] = useState('');
+  const [
+    chosenCategoryTitles,
+    setChosenCategoryTitles,
+  ] = useState([]);
+  const [isFirstCategoryClick, setIsFirstCategoryClick] = useState(true);
 
   const handleOwnerChange = (user) => {
     setChosenOwner(user.name);
@@ -44,15 +49,37 @@ export const App = () => {
   const handleResetAllFilters = () => {
     setChosenOwner('All');
     setQuery('');
+    setChosenCategoryTitles([]);
+    setIsFirstCategoryClick(true);
+  };
+
+  const handleCategoryChooseAll = () => {
+    setChosenCategoryTitles([]);
+    setIsFirstCategoryClick(true);
+  };
+
+  const handleCategoryChoose = (category) => {
+    if (isFirstCategoryClick) {
+      setChosenCategoryTitles([category.title]);
+      setIsFirstCategoryClick(false);
+    } else if (chosenCategoryTitles.includes(category.title)) {
+      setChosenCategoryTitles(prev => (
+        prev.filter(prevTitle => prevTitle !== category.title)
+      ));
+    } else {
+      setChosenCategoryTitles(prev => [...prev, category.title]);
+    }
   };
 
   const searchQuery = query.trim().toLowerCase();
 
   const visibleProducts = products
     .filter(product => (
-      product.user.name === chosenOwner || chosenOwner === 'All'
-    ))
-    .filter(product => (product.name.toLowerCase().includes(searchQuery)));
+      (product.user.name === chosenOwner || chosenOwner === 'All')
+        && (product.name.toLowerCase().includes(searchQuery))
+        && (chosenCategoryTitles.includes(product.category.title)
+          || chosenCategoryTitles.length === 0)
+    ));
 
   const isAnyProductFound = visibleProducts.length !== 0;
 
@@ -121,41 +148,28 @@ export const App = () => {
               <a
                 href="#/"
                 data-cy="AllCategories"
-                className="button is-success mr-6 is-outlined"
+                className={cn('button is-success mr-6', {
+                  'is-outlined': chosenCategoryTitles.length !== 0,
+                })}
+                onClick={handleCategoryChooseAll}
               >
                 All
               </a>
 
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 4
-              </a>
+              {categoriesFromServer.map(category => (
+                <a
+                  key={category.id}
+                  data-cy="Category"
+                  className={cn('button mr-2 my-1', {
+                    'is-info': chosenCategoryTitles
+                      .includes(category.title) && !isFirstCategoryClick,
+                  })}
+                  href="#/"
+                  onClick={() => handleCategoryChoose(category)}
+                >
+                  {category.title}
+                </a>
+              ))}
             </div>
 
             <div className="panel-block">
