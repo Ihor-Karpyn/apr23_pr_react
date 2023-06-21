@@ -105,15 +105,15 @@ export const App = () => {
   const changeSortType = (type) => {
     if (sortType !== type) {
       setSortType(type);
-      setIsReversed(false);
       setSortClick(1);
+      setIsReversed(false);
     } else if (sortClick === 1) {
-      setIsReversed(true);
       setSortClick(2);
+      setIsReversed(true);
     } else {
       setSortType('None');
-      setIsReversed(false);
       setSortClick(0);
+      setIsReversed(false);
     }
   };
 
