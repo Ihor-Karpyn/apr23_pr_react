@@ -25,26 +25,34 @@ const products = productsFromServer.map((product) => {
 export const App = () => {
   const [selectedUserId, setSelectedUserId] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const preparedProducts = products.filter((productItem) => {
     let matchUserName = true;
     let matchSearchQuerry = true;
+    let matchSelectedCategories = true;
 
     if (selectedUserId) {
       matchUserName = selectedUserId === productItem.user.id;
     }
 
     if (searchQuery) {
-      const regex = new RegExp(searchQuery, 'gi');
+      const regex = new RegExp(searchQuery.trim(), 'gi');
 
       matchSearchQuerry = regex.test(productItem.name);
     }
 
-    return matchUserName && matchSearchQuerry;
+    if (selectedCategories.length > 0) {
+      matchSelectedCategories = selectedCategories
+        .includes(productItem.categoryId);
+    }
+
+    return matchUserName && matchSearchQuerry && matchSelectedCategories;
   });
 
   const isNoMatchingProducts = preparedProducts.length === 0;
   const isSearchQueryNotEmpty = searchQuery;
+  const isSelectedCategoriesNotEmpty = selectedCategories.length > 0;
 
   const onSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -57,6 +65,25 @@ export const App = () => {
   const handleResetAllFilters = () => {
     handleResetInput();
     setSelectedUserId(0);
+    setSelectedCategories([]);
+  };
+
+  const handleSelectCategory = (id) => {
+    setSelectedCategories((currentSelectedCategories) => {
+      if (currentSelectedCategories.includes(id)) {
+        const index = currentSelectedCategories.indexOf(id);
+
+        currentSelectedCategories.splice(index, 1);
+
+        return [...currentSelectedCategories];
+      }
+
+      return ([
+        ...currentSelectedCategories,
+        id,
+      ]
+      );
+    });
   };
 
   return (
@@ -132,41 +159,31 @@ export const App = () => {
               <a
                 href="#/"
                 data-cy="AllCategories"
-                className="button is-success mr-6 is-outlined"
+                className={cn('button is-success mr-6', {
+                  'is-outlined': isSelectedCategoriesNotEmpty,
+                })}
+                onClick={() => setSelectedCategories([])}
               >
                 All
               </a>
+              {categoriesFromServer.map((currentCategory) => {
+                const { id, title } = currentCategory;
+                const isSelected = selectedCategories.includes(id);
 
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 4
-              </a>
+                return (
+                  <a
+                    key={id}
+                    data-cy="Category"
+                    className={cn('button mr-2 my-1', {
+                      'is-info': isSelected,
+                    })}
+                    href="#/"
+                    onClick={() => handleSelectCategory(id)}
+                  >
+                    {title}
+                  </a>
+                );
+              })}
             </div>
 
             <div className="panel-block">
