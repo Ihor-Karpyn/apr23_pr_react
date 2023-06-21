@@ -1,4 +1,4 @@
-export default [
+export const categoriesFromServer = [
   {
     id: 1,
     title: 'Grocery',
