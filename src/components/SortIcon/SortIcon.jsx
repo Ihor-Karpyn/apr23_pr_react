@@ -3,16 +3,16 @@ import cn from 'classnames';
 
 export const SortIcon = ({
   title,
-  onClick,
   sortType,
   sortClick,
+  changeSortType,
 }) => (
   <span className="is-flex is-flex-wrap-nowrap">
     {title}
 
     <a
       href="#/"
-      onClick={() => onClick(title)}
+      onClick={() => changeSortType(title)}
     >
       <span className="icon">
         <i

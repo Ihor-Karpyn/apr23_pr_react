@@ -35,21 +35,6 @@ export const App = () => {
   const [sortClick, setSortClick] = useState(0);
   const [isReversed, setIsReversed] = useState(false);
 
-  const handleSortClick = (type) => {
-    if (sortType !== type) {
-      setSortType(type);
-      setIsReversed(false);
-      setSortClick(1);
-    } else if (sortClick === 1) {
-      setIsReversed(true);
-      setSortClick(2);
-    } else {
-      setSortType('None');
-      setIsReversed(false);
-      setSortClick(0);
-    }
-  };
-
   useEffect(() => {
     setProducts(preparedProducts);
   }, []);
@@ -114,6 +99,21 @@ export const App = () => {
         ...currentCategories,
         categoryId,
       ]);
+    }
+  };
+
+  const changeSortType = (type) => {
+    if (sortType !== type) {
+      setSortType(type);
+      setIsReversed(false);
+      setSortClick(1);
+    } else if (sortClick === 1) {
+      setIsReversed(true);
+      setSortClick(2);
+    } else {
+      setSortType('None');
+      setIsReversed(false);
+      setSortClick(0);
     }
   };
 
@@ -255,9 +255,9 @@ export const App = () => {
                     <th>
                       <SortIcon
                         title={category}
-                        onClick={handleSortClick}
                         sortType={sortType}
                         sortClick={sortClick}
+                        changeSortType={changeSortType}
                       />
                     </th>
                   ))}
